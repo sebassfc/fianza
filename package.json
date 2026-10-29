@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "next typegen && tsc --noEmit",
-    "smoke": "tsx --env-file-if-exists=.env.local scripts/sandbox-smoke.ts"
+    "smoke": "tsx --env-file-if-exists=.env.local scripts/sandbox-smoke.ts",
+    "fianza": "tsx --env-file-if-exists=.env.local scripts/fianza.ts"
   },
   "dependencies": {
     "@paypal/paypal-server-sdk": "2.5.0",

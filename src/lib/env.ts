@@ -14,6 +14,15 @@ const schema = z.object({
 
 export type Env = z.infer<typeof schema>;
 
+// Settings the 402 endpoint and bond page need. No secrets, so they work before PayPal is configured.
+const appSchema = schema.pick({ APP_BASE_URL: true, BOND_AMOUNT_USD: true });
+
+export type AppConfig = z.infer<typeof appSchema>;
+
+export function appConfig(source: Record<string, string | undefined> = process.env): AppConfig {
+  return appSchema.parse(source);
+}
+
 let cached: Env | undefined;
 
 export function env(): Env {
