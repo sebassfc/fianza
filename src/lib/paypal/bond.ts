@@ -133,6 +133,16 @@ export async function getAuthorization(authorizationId: string): Promise<Authori
   }
 }
 
+/** Source of truth for captures and refunds (a refunded capture reports REFUNDED or PARTIALLY_REFUNDED). */
+export async function getCapture(captureId: string): Promise<{ captureId: string; status: string }> {
+  try {
+    const { result } = await payments().getCapturedPayment({ captureId });
+    return { captureId, status: String(result.status) };
+  } catch (err) {
+    throw toPayPalError(err, "get capture");
+  }
+}
+
 /** The default outcome: releases the hold, the operator pays $0. */
 export async function voidBond(authorizationId: string, ref: BondRef, opts: Mock = {}): Promise<void> {
   try {
