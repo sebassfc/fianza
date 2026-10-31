@@ -57,6 +57,17 @@ describe("MemoryBondStore", () => {
     got!.state = "VOIDED";
     expect((await s.get(ref))?.state).toBe("BONDED");
   });
+
+  it("lists the most recently updated bonds first, up to the limit", async () => {
+    const s = new MemoryBondStore();
+    const at = (pr: number, iso: string) => ({ ...record("BONDED"), ref: { ...ref, pr }, history: [{ at: iso, event: "AUTHORIZED" }] });
+    await s.put(at(1, "2026-10-29T10:00:00Z"));
+    await s.put(at(2, "2026-10-29T12:00:00Z"));
+    await s.put(at(3, "2026-10-29T11:00:00Z"));
+    await s.put({ ...record("AWAITING_BOND"), ref: { ...ref, pr: 4 } });
+    expect((await s.list()).map((r) => r.ref.pr)).toEqual([2, 3, 1, 4]);
+    expect((await s.list(2)).map((r) => r.ref.pr)).toEqual([2, 3]);
+  });
 });
 
 describe("GET /bond/{owner}/{repo}/{pr}", () => {

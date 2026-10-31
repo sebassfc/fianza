@@ -24,6 +24,8 @@ export interface BondStore {
   getByLabel(label: string): Promise<BondRecord | null>;
   put(record: BondRecord): Promise<void>;
   repoStats(owner: string, repo: string): Promise<RepoStats>;
+  /** Most recently updated first. */
+  list(limit?: number): Promise<BondRecord[]>;
 }
 
 /** Webhook event ids already applied. PayPal retries for 3 days, so delivery is at-least-once. */
@@ -61,6 +63,14 @@ export class MemoryBondStore implements BondStore {
 
   async put(record: BondRecord) {
     this.records.set(bondKey(record.ref), structuredClone(record));
+  }
+
+  async list(limit = 50) {
+    const lastAt = (r: BondRecord) => r.history.at(-1)?.at ?? "";
+    return [...this.records.values()]
+      .sort((a, b) => lastAt(b).localeCompare(lastAt(a)))
+      .slice(0, limit)
+      .map((r) => structuredClone(r));
   }
 
   async repoStats(owner: string, repo: string): Promise<RepoStats> {
