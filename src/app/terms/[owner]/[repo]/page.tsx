@@ -21,7 +21,10 @@ async function TermsBody({ params }: PageProps<"/terms/[owner]/[repo]">) {
   const items: [string, string][] = [
     [`Who: only pull requests declared as agent-generated. Humans are never asked for a bond.`, "Quién: solo PRs declarados como de agente. A los humanos nunca se les pide fianza."],
     [`What: a refundable PayPal hold of $${BOND_AMOUNT_USD} USD on the exact commit. It buys a review within ${EXPRESS_REVIEW_HOURS} hours.`, `Qué: una retención reembolsable de PayPal de $${BOND_AMOUNT_USD} USD sobre el commit exacto. Compra una revisión en ${EXPRESS_REVIEW_HOURS} horas.`],
-    ["Default: the hold is voided. Honest work costs $0.", "Por defecto: la retención se anula. El trabajo honesto cuesta $0."],
+    [
+      `Default: the hold is voided. Honest work costs $0, and so does a review that never comes: with no maintainer decision in ${EXPRESS_REVIEW_HOURS} hours the hold is voided automatically.`,
+      `Por defecto: la retención se anula. El trabajo honesto cuesta $0, y una revisión que nunca llega también: si ningún maintainer decide en ${EXPRESS_REVIEW_HOURS} horas, la retención se anula sola.`,
+    ],
     [
       `Forfeit: only when at least ${MIN_HARD_FLAGS_TO_FORFEIT} deterministic red flags exist (failing CI, deleted or skipped tests, trivially-true assertions) and a maintainer confirms. A model's opinion never counts. Prompt injection freezes the decision at review.`,
       `Cobro: solo con al menos ${MIN_HARD_FLAGS_TO_FORFEIT} señales deterministas (CI fallando, pruebas borradas o saltadas, aserciones que siempre pasan) y la confirmación de un maintainer. La opinión de un modelo nunca cuenta.`,

@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { bondStore, type BondRecord } from "@/lib/store";
 
@@ -26,7 +27,9 @@ export default function Dashboard() {
 }
 
 async function Ledger() {
-  const bonds = await bondStore().list(100);
+  // Request-time data: without this the in-memory store would be read once at build time.
+  await connection();
+  const bonds = await bondStore().list({ limit: 100 });
   if (bonds.length === 0) return <p>No bonds yet. · Todavía no hay fianzas.</p>;
   const count = (s: BondRecord["state"]) => bonds.filter((b) => b.state === s).length;
 

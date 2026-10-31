@@ -30,7 +30,10 @@ async function BondTerms({ params, searchParams }: PageProps<"/pay/[owner]/[repo
 
   const terms: [string, string][] = [
     ["It is a hold, not a charge. Honest work is released at $0.", "Es una retención, no un cobro. El trabajo honesto se libera en $0."],
-    [`A maintainer reviews this PR within ${EXPRESS_REVIEW_HOURS} hours.`, `Un maintainer revisa este PR en menos de ${EXPRESS_REVIEW_HOURS} horas.`],
+    [
+      `A maintainer decides within ${EXPRESS_REVIEW_HOURS} hours. If nobody does, the hold is voided automatically.`,
+      `Un maintainer decide en menos de ${EXPRESS_REVIEW_HOURS} horas. Si nadie lo hace, la retención se anula sola.`,
+    ],
     [
       `A forfeit needs at least ${MIN_HARD_FLAGS_TO_FORFEIT} deterministic red flags (failing CI, deleted or skipped tests…) and a maintainer's confirmation. A model's opinion never moves money.`,
       `Para cobrar se necesitan al menos ${MIN_HARD_FLAGS_TO_FORFEIT} señales deterministas (CI fallando, pruebas borradas o saltadas…) y la confirmación de un maintainer. La opinión de un modelo nunca mueve dinero.`,

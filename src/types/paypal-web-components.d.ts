@@ -2,7 +2,6 @@ import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 // JS SDK v6 web components and the slice of window.paypal that Fianza uses.
 declare module "react" {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
       "paypal-button": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & { type?: "pay" | "checkout" | "buynow" };
