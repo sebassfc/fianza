@@ -96,6 +96,16 @@ describe("checkClaims", () => {
     expect(calls).toHaveLength(0);
   });
 
+  it("without an API key reports itself not configured instead of failing the webhook", async () => {
+    const saved = process.env.ANTHROPIC_API_KEY;
+    delete process.env.ANTHROPIC_API_KEY;
+    try {
+      expect(await checkClaims({ ...input, title: "no key" })).toMatchObject({ complete: false, reason: "not_configured" });
+    } finally {
+      if (saved !== undefined) process.env.ANTHROPIC_API_KEY = saved;
+    }
+  });
+
   it("incomplete claim checks freeze the recommendation at REVIEW", () => {
     const slop = `diff --git a/a.test.ts b/a.test.ts\n--- a/a.test.ts\n+++ b/a.test.ts\n@@ -1 +1 @@\n-expect(f()).toBe(2)\n+it.skip("x", () => expect(true).toBe(true))\n`;
     const evidence = buildEvidence({ diff: slop, ci: { conclusion: "failure" }, texts: [], externalChecksComplete: false });

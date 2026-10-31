@@ -1,0 +1,26 @@
+name: Bug report
+description: Something Fianza did with a bond, a report or a label was wrong.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste credentials, webhook secrets or real payment details. Fianza only uses the PayPal sandbox.
+        Security problems go to SECURITY.md, not here.
+  - type: input
+    id: pr
+    attributes:
+      label: Pull request
+      description: owner/repo#number and head commit, if it involves a bond.
+      placeholder: acme/widgets#42 @ abc1234
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Bond history or report excerpt
+      description: The dashboard row or the Fianza comment. Remove anything private.

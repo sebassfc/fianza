@@ -1,6 +1,6 @@
 ---
 name: fianza
-description: Use after opening or updating a pull request on a repository that uses Fianza (it has .github/fianza.yml, or the Fianza bot asked for a bond). Checks whether the repo wants a refundable review bond for an AI-agent PR, relays the terms to the human, and stops until the human approves. Never pays or approves anything itself.
+description: Use after opening or updating a pull request on a repository that uses Fianza (the Fianza GitHub App is installed and its bot asked for a bond, or `pnpm fianza request-bond` answers 402). Checks whether the repo wants a refundable review bond for an AI-agent PR, relays the terms to the human, and stops until the human approves. Never pays or approves anything itself.
 ---
 
 # Fianza: refundable review bonds for AI-agent pull requests

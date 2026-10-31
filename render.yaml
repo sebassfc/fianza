@@ -1,0 +1,72 @@
+# Render Blueprint: one web service, one cron job, one Postgres database.
+# Render asks once for every `sync: false` value. Every PayPal value must come from a SANDBOX app.
+# Spec: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: fianza
+    runtime: node
+    region: oregon
+    # Paid instance: free ones sleep after 15 idle minutes and judges would wait for a cold start.
+    plan: 0.5c-512mb
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: BOND_AMOUNT_USD
+        value: "5.00"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY
+        sync: false
+      - key: GITHUB_WEBHOOK_SECRET
+        sync: false
+      - key: FIANZA_MONTHLY_FORFEIT_CAP
+        value: "5"
+      - key: CRON_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fianza-db
+          property: connectionString
+      # APP_BASE_URL is optional here: the app falls back to Render's RENDER_EXTERNAL_URL.
+
+  # Keeps the 48-hour review guarantee: voids holds nobody decided on. Talks to the web service
+  # over Render's private network, so the endpoint is never called from outside with this secret.
+  - type: cron
+    name: fianza-reconcile
+    runtime: node
+    region: oregon
+    schedule: "*/15 * * * *"
+    buildCommand: "true"
+    startCommand: 'curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$FIANZA_HOSTPORT/api/cron/reconcile"'
+    envVars:
+      - key: CRON_SECRET
+        fromService:
+          name: fianza
+          type: web
+          envVarKey: CRON_SECRET
+      - key: FIANZA_HOSTPORT
+        fromService:
+          name: fianza
+          type: web
+          property: hostport
+
+databases:
+  # Paid: free Render Postgres expires after 30 days, before judging ends.
+  - name: fianza-db
+    region: oregon
+    plan: 0.1c-256mb
+    databaseName: fianza
+    user: fianza

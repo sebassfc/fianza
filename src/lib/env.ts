@@ -19,15 +19,20 @@ const appSchema = schema.pick({ APP_BASE_URL: true, BOND_AMOUNT_USD: true });
 
 export type AppConfig = z.infer<typeof appSchema>;
 
-export function appConfig(source: Record<string, string | undefined> = process.env): AppConfig {
-  return appSchema.parse(source);
+type Source = Record<string, string | undefined>;
+
+/** On Render the public URL is known without configuration. */
+const withHostDefaults = (source: Source): Source => ({ ...source, APP_BASE_URL: source.APP_BASE_URL || source.RENDER_EXTERNAL_URL || undefined });
+
+export function appConfig(source: Source = process.env): AppConfig {
+  return appSchema.parse(withHostDefaults(source));
 }
 
 let cached: Env | undefined;
 
 export function env(): Env {
   if (cached) return cached;
-  const parsed = schema.safeParse(process.env);
+  const parsed = schema.safeParse(withHostDefaults(process.env));
   if (!parsed.success) {
     const fields = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
     throw new Error(`Invalid environment. Copy .env.example to .env.local and fill it in.\n  ${fields.join("\n  ")}`);
