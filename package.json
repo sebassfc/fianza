@@ -13,6 +13,7 @@
     "fianza": "tsx --env-file-if-exists=.env.local scripts/fianza.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "@paypal/paypal-server-sdk": "2.5.0",
     "next": "16.4.2",
     "react": "19.3.0",
