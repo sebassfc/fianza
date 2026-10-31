@@ -34,9 +34,10 @@ export type BondStatusBody =
   | { status: "forfeited"; charged: string; appeal_url: string }
   | { status: "refunded"; charged: "0.00" };
 
-export function forfeitRateLabel(stats: RepoStats): string {
-  if (stats.bonds === 0) return "no bonds yet";
-  return `${stats.forfeits} of ${stats.bonds} (${Math.round((stats.forfeits / stats.bonds) * 100)}%)`;
+export function forfeitRateLabel(stats: RepoStats, lang: "en" | "es" = "en"): string {
+  if (stats.bonds === 0) return lang === "en" ? "no bonds yet" : "todavía no hay fianzas";
+  const pct = Math.round((stats.forfeits / stats.bonds) * 100);
+  return lang === "en" ? `${stats.forfeits} of ${stats.bonds} (${pct}%)` : `${stats.forfeits} de ${stats.bonds} (${pct}%)`;
 }
 
 /**
