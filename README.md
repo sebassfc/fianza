@@ -35,7 +35,7 @@ flowchart LR
   C --> R
   M[Maintainer] -- "/fianza accept · forfeit · appeal" --> F
   F -- "void · capture · refund<br/>(PayPal-Request-Id)" --> PP
-  CR["Render cron, every 15 min"] -- "reconcile: void after 48 h" --> F
+  CR["GitHub Actions, every hour"] -- "reconcile: void after 48 h" --> F
   F <--> DB[(Postgres)]
 ```
 
@@ -105,7 +105,11 @@ Without `DATABASE_URL` the store is in memory and resets on restart. Without `AN
 
 ## Deploy
 
-[`render.yaml`](render.yaml) defines the web service, the reconciler cron job and Postgres. Render asks for each secret once; `CRON_SECRET` is generated.
+[`render.yaml`](render.yaml) defines one web service on Render's **free plan**. Render asks for each secret once.
+
+- **It sleeps.** A free instance spins down after 15 minutes without traffic and takes about a minute to wake up. Open the site once and wait for it before trying the demo.
+- **Postgres is external.** Render's free database expires after 30 days, so `DATABASE_URL` points to a free Neon database.
+- **The reconciler runs on GitHub Actions.** Render has no free cron jobs, so [`.github/workflows/reconcile.yml`](.github/workflows/reconcile.yml) calls `POST /api/cron/reconcile` every hour. It needs the `FIANZA_URL` repository variable and a `CRON_SECRET` secret with the same value as on Render.
 
 ## Honest limits
 

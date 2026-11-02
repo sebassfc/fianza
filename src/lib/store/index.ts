@@ -98,6 +98,8 @@ function sql(): Sql | null {
   if (!url) return null;
   if (!globalStore.__fianzaSql) {
     const pool = new Pool({ connectionString: url, max: 5 });
+    // A hosted Postgres that scales to zero drops idle connections; unhandled, that error kills the process.
+    pool.on("error", (err) => console.error("postgres idle client error:", err.message));
     globalStore.__fianzaSql = withSchema({ query: async (text, params) => ({ rows: (await pool.query(text, params)).rows as never[] }), exec: (text) => pool.query(text) });
   }
   return globalStore.__fianzaSql;

@@ -5,7 +5,7 @@ import { bondStore } from "@/lib/store";
 
 const digest = (s: string) => createHash("sha256").update(s).digest();
 
-/** POST /api/cron/reconcile with `Authorization: Bearer $CRON_SECRET`. Called by the Render cron job. */
+/** POST /api/cron/reconcile with `Authorization: Bearer $CRON_SECRET`. Called hourly by .github/workflows/reconcile.yml. */
 export async function POST(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) return Response.json({ error: "CRON_SECRET is not configured" }, { status: 503 });

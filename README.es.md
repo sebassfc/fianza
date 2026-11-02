@@ -24,7 +24,7 @@ A los humanos nunca se les pide fianza. Los PRs que no se declaran como de agent
 2. El humano aprueba la retención con el botón de PayPal (JS SDK v6). El servidor confirma con PayPal antes de darla por hecha.
 3. Corre el CI. Reglas deterministas sobre el diff y una revisión de afirmaciones con Claude Opus 5.5 arman un reporte con citas, en inglés y español.
 4. El maintainer comenta `/fianza aceptar`, `/fianza cobrar` o `/fianza apelar`. Fianza anula, cobra o reembolsa en PayPal, una sola vez.
-5. Cada 15 minutos un cron anula las retenciones sin decisión después de 48 horas.
+5. Cada hora, una tarea de GitHub Actions anula las retenciones sin decisión después de 48 horas.
 
 El diagrama, la tabla de endpoints de PayPal y las garantías de corrección de pagos, con sus pruebas, están en el [README en inglés](README.md).
 

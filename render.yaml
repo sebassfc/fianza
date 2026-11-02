@@ -1,15 +1,25 @@
-# Render Blueprint: one web service, one cron job, one Postgres database.
-# Render asks once for every `sync: false` value. Every PayPal value must come from a SANDBOX app.
+# Render Blueprint: one free web service. Render asks once for every `sync: false` value.
+# Every PayPal value must come from a SANDBOX app.
 # Spec: https://render.com/docs/blueprint-spec
+#
+# Free plan, no card on file, so three things live elsewhere:
+# - Postgres: Render's free database expires 30 days after creation, before judging ends (Dec 15).
+#   DATABASE_URL points to an external free Postgres instead (Neon, no expiry).
+# - The 48-hour reconciler: cron jobs have no free plan. .github/workflows/reconcile.yml calls
+#   POST /api/cron/reconcile every hour with CRON_SECRET (a GitHub Actions secret with the same value).
+# - Wake-ups: a free instance sleeps after 15 idle minutes and takes about a minute to wake.
+#   Free hours (750 a month) are shared with every free service in the workspace, so do not
+#   schedule the reconciler more often than hourly: every 15 minutes would keep it awake all month.
 services:
   - type: web
     name: fianza
     runtime: node
     region: oregon
-    # Paid instance: free ones sleep after 15 idle minutes and judges would wait for a cold start.
-    plan: 0.5c-512mb
+    plan: free
+    numInstances: 1
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
-    startCommand: pnpm start
+    # Straight to the Next binary: through pnpm, Corepack downloads pnpm again on every wake-up.
+    startCommand: node_modules/.bin/next start -H 0.0.0.0
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
@@ -34,39 +44,9 @@ services:
         sync: false
       - key: FIANZA_MONTHLY_FORFEIT_CAP
         value: "5"
+      # Same value as the CRON_SECRET Actions secret: `openssl rand -hex 32`.
       - key: CRON_SECRET
-        generateValue: true
+        sync: false
       - key: DATABASE_URL
-        fromDatabase:
-          name: fianza-db
-          property: connectionString
+        sync: false
       # APP_BASE_URL is optional here: the app falls back to Render's RENDER_EXTERNAL_URL.
-
-  # Keeps the 48-hour review guarantee: voids holds nobody decided on. Talks to the web service
-  # over Render's private network, so the endpoint is never called from outside with this secret.
-  - type: cron
-    name: fianza-reconcile
-    runtime: node
-    region: oregon
-    schedule: "*/15 * * * *"
-    buildCommand: "true"
-    startCommand: 'curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$FIANZA_HOSTPORT/api/cron/reconcile"'
-    envVars:
-      - key: CRON_SECRET
-        fromService:
-          name: fianza
-          type: web
-          envVarKey: CRON_SECRET
-      - key: FIANZA_HOSTPORT
-        fromService:
-          name: fianza
-          type: web
-          property: hostport
-
-databases:
-  # Paid: free Render Postgres expires after 30 days, before judging ends.
-  - name: fianza-db
-    region: oregon
-    plan: 0.1c-256mb
-    databaseName: fianza
-    user: fianza
