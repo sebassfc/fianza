@@ -12,7 +12,7 @@
 #   schedule the reconciler more often than hourly: every 15 minutes would keep it awake all month.
 services:
   - type: web
-    name: fianza
+    name: fianza-bond
     runtime: node
     region: oregon
     plan: free
