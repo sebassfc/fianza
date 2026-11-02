@@ -84,6 +84,8 @@ AWAITING_BOND ──authorize──▶ BONDED ──void (default, or 48 h with 
 | The review guarantee holds | The reconciler voids holds with no decision after 48 hours | `reconcile.test.ts` |
 | State survives restarts | Postgres store, same contract tests as the in-memory store | `store.test.ts` |
 
+Against the real PayPal sandbox (`pnpm smoke run`, November 2, 2026), 19 of 19 steps behaved as expected: release, a failed capture that was looked up before retrying, one capture on replay and a refund. See [`docs/sandbox-findings.md`](docs/sandbox-findings.md).
+
 ## The agent side
 
 - `GET /bond/{owner}/{repo}/{pr}?sha=…` answers **HTTP 402** with the amount, the approval link for the human, the terms and the repo's forfeit rate.
