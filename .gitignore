@@ -45,3 +45,6 @@ next-env.d.ts
 
 # env files: only the example is committed
 !.env.example
+
+# demo repository built by scripts/demo-repo.sh
+/.demo/

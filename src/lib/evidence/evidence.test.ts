@@ -73,6 +73,16 @@ describe("testWeakening", () => {
     expect(skip?.ref).toBe("src/sum.test.ts:2");
   });
 
+  it("counts node:assert calls as assertions", () => {
+    const diff = `diff --git a/test/money.test.js b/test/money.test.js\n--- a/test/money.test.js\n+++ b/test/money.test.js\n@@ -4,2 +4,2 @@\n-  assert.strictEqual(round(0.125), 0.13);\n-  t.assert.deepEqual(split(1, 3), [0.34, 0.33, 0.33]);\n+  assert.ok(true);\n`;
+    expect(testWeakening(parseDiff(diff)).map((f) => f.id)).toEqual(["assertions_removed", "trivial_assertion"]);
+  });
+
+  it("does not count `import assert` as an assertion", () => {
+    const diff = `diff --git a/test/a.test.js b/test/a.test.js\n--- a/test/a.test.js\n+++ b/test/a.test.js\n@@ -1,2 +1,1 @@\n-import assert from "node:assert/strict";\n import { test } from "node:test";\n`;
+    expect(testWeakening(parseDiff(diff))).toEqual([]);
+  });
+
   it("leaves an honest fix with a new test alone", () => {
     expect(testWeakening(parseDiff(genuineDiff))).toEqual([]);
   });

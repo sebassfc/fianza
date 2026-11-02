@@ -1,7 +1,7 @@
 import type { Flag } from "@/lib/policy";
 import { isTestFile, type FileDiff } from "./diff";
 
-const ASSERTION = /\b(expect|assert(?:Equal|True|False|That|Throws)?|should)\s*\(|\bassert\s|\.should\./;
+const ASSERTION = /\b(expect|assert(?:Equal|True|False|That|Throws)?|should)\s*\(|\bassert\.\w+\s*\(|^\s*assert\s|\.should\./;
 const FOCUS_OR_SKIP = /\b(it|test|describe)\.(skip|only|todo)\s*\(|\b(xit|xdescribe|xtest|fit|fdescribe)\s*\(|@pytest\.mark\.skip|t\.Skip\(/;
 const TRIVIAL_ASSERTION = /\bexpect\s*\(\s*(true|1|!0)\s*\)\s*\.to(Be|Equal)\s*\(\s*(true|1|!0)\s*\)|\bassert\s*\(?\s*True\s*\)?\s*$|\bassert\.ok\s*\(\s*true\s*\)/;
 const EMPTY_CATCH = /\bcatch\s*(\([^)]*\))?\s*\{\s*\}|\bexcept[^:]*:\s*pass\b/;
